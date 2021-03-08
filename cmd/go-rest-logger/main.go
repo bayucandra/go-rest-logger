@@ -65,8 +65,8 @@ func allHandler(w http.ResponseWriter, r *http.Request) {
 		addr = addr[:i]
 	}
 
-	var datab []byte
-	var data string
+	var bodyDatab []byte
+	var bodyData string
 
 	if r.Method == "POST" {
 		var request map[string]interface{}
@@ -74,10 +74,13 @@ func allHandler(w http.ResponseWriter, r *http.Request) {
 		err := json.NewDecoder(r.Body).Decode(&request)
 
 		if err == nil {
-			datab, err = json.Marshal(request)
-			data = string(datab)
+			bodyDatab, err = json.Marshal(request)
+			bodyData = string(bodyDatab)
 		}
 	}
+
+	queryStringEnc := r.URL.Query().Encode()
+	rawQuery := r.URL.RawQuery
 
 	fmt.Printf(`
 ========================================
@@ -85,9 +88,11 @@ func allHandler(w http.ResponseWriter, r *http.Request) {
 	clientIp: %s
 	method:   %s
 	URL:      %s
-	data:     %s
+	bodyData:     %s
+	querystringEnc: %s
+	rawQuery := %s
 ****************************************`,
-	addr, clientIp, r.Method, r.URL, data)
+	addr, clientIp, r.Method, r.URL, bodyData, queryStringEnc, rawQuery)
 
 	w.WriteHeader(http.StatusAccepted)
 }
